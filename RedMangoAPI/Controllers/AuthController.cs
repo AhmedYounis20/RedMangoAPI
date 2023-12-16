@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RedMangoAPI.Models;
 using RedMangoAPI.Utility;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace RedMangoAPI.Controllers
 {
@@ -31,6 +35,7 @@ namespace RedMangoAPI.Controllers
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             ApplicationUser? userFromDb = await _db.ApplicationUsers.FirstOrDefaultAsync(e => e.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
+            
             if (userFromDb == null)
             {
                 _response.IsSuccess = false;
@@ -49,10 +54,30 @@ namespace RedMangoAPI.Controllers
                 return BadRequest(_response);
             }
 
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.ASCII.GetBytes(secretKey);
+            var roles = await _userManager.GetRolesAsync(userFromDb);
+
+            SecurityTokenDescriptor tokenDescriptor = new() {
+                Subject = new System.Security.Claims.ClaimsIdentity(new Claim[] {
+                    new Claim("fullName", userFromDb.Name),
+                    new Claim("id", userFromDb.Id.ToString()),
+                    new Claim(ClaimTypes.Email, userFromDb.UserName.ToString()),
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault().ToUpper()),
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+
+            SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            
+
+
             LoginResponseDTO response = new LoginResponseDTO
             {
                 Email = userFromDb.Email,
-                Token = "replace in future"
+                Token = tokenHandler.WriteToken(securityToken),
             };
             if (string.IsNullOrEmpty(response.Email)|| string.IsNullOrEmpty(response.Token))
             {
