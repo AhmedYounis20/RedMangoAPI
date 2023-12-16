@@ -1,0 +1,29 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RedMangoAPI;
+
+public class OrderHeader
+{
+    [Key]
+    public int OrderHeaderId { get; set; }
+    [Required]
+    public string? PickupName { get; set; }
+    [Required]
+    public string? PickupPhoneNumber { get; set; }
+    [Required]
+    public string? PickupEmail { get; set; }
+    
+    public string? ApplicationUserId { get; set; }
+    [ForeignKey(nameof(ApplicationUserId))]
+    public ApplicationUser? User { get; set; }
+
+    public double OrderTotal { get; set; }
+
+
+    public DateTime OrderDate { get; set; }
+    public string? StripePaymentIntentID { get;set; }
+    public string? Status { get; set; }
+    public int TotalItems { get; set; }
+}
