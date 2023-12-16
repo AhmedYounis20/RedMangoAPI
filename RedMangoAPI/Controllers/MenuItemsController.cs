@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
 using RedMangoAPI.Models;
 using RedMangoAPI.Utility;
-using System.Reflection.Metadata;
 
 namespace RedMangoAPI;
 
@@ -21,6 +20,7 @@ public class MenuItemsController : ControllerBase
         _blobService = blobService;
     }
 
+    [Authorize(Roles = SD.Role_Admin)]
     [HttpGet]
     public async Task<IActionResult> GetMenuItems()
     {
@@ -58,7 +58,7 @@ public class MenuItemsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse>> CreateMenuItem([FromBody] MenuItemCreateDTO menuItemCreateDTO)
+    public async Task<ActionResult<ApiResponse>> CreateMenuItem(MenuItemCreateDTO menuItemCreateDTO)
     {
         try
         {
