@@ -20,7 +20,6 @@ public class MenuItemsController : ControllerBase
         _blobService = blobService;
     }
 
-    [Authorize(Roles = SD.Role_Admin)]
     [HttpGet]
     public async Task<IActionResult> GetMenuItems()
     {
@@ -49,7 +48,7 @@ public class MenuItemsController : ControllerBase
             }
             else
             {
-                _response.Result = _db.MenuItems;
+                _response.Result = menuItem;
                 _response.IsSuccess = true;
                 _response.StatusCode = System.Net.HttpStatusCode.OK;
                 return Ok(_response);
