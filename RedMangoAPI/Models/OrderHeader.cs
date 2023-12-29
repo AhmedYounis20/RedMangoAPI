@@ -26,4 +26,6 @@ public class OrderHeader
     public string? StripePaymentIntentID { get;set; }
     public string? Status { get; set; }
     public int TotalItems { get; set; }
+
+    public IEnumerable<OrderDetails>? OrderDetails { get; set; }
 }

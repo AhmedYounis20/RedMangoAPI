@@ -89,15 +89,18 @@ public class ShoppingCartController : ControllerBase
     {
         try
         {
+            ShoppingCart? shoppingCart = null;
             if (string.IsNullOrEmpty(userId))
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                shoppingCart = new();
+                _response.Result = shoppingCart;
 
-                return BadRequest(_response);
+                return Ok(_response);
             }
 
-            ShoppingCart? shoppingCart = await _context.ShoppingCarts.Include(e=>e.CartItems).ThenInclude(e=>e.MenuItem).FirstOrDefaultAsync(e=>e.UserId == userId);
+            shoppingCart = await _context.ShoppingCarts.Include(e=>e.CartItems).ThenInclude(e=>e.MenuItem).FirstOrDefaultAsync(e=>e.UserId == userId);
 
             if(shoppingCart?.CartItems != null && shoppingCart.CartItems.Any())
             {

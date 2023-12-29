@@ -91,10 +91,18 @@ builder.Services.AddCors();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+    app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseSwaggerUI(e =>
+    {
+        e.SwaggerEndpoint("/swagger/v1/swagger.json", "Red Mango Api V1");
+        e.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseHttpsRedirection();
